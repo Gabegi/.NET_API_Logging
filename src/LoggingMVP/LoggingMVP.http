@@ -1,0 +1,6 @@
+@LoggingMVP_HostAddress = http://localhost:5054
+
+GET {{LoggingMVP_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

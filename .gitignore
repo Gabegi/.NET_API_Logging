@@ -52,3 +52,33 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.sln.iml
+*.suo
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+claude_code.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local
+.env
+.env.local
+logs/
+*.log
