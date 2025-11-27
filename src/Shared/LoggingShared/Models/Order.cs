@@ -1,5 +1,13 @@
 namespace LoggingShared.Models;
 
+public record Product(
+    string Id,
+    string Name,
+    string Description,
+    decimal Price,
+    int StockQuantity,
+    DateTime CreatedAt);
+
 public record Order(
     string Id,
     string CustomerId,
