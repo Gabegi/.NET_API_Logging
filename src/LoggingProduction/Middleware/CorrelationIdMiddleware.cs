@@ -20,7 +20,7 @@ public class CorrelationIdMiddleware
             : Guid.NewGuid().ToString();
 
         context.Items[CorrelationIdLogKey] = correlationId;
-        context.Response.Headers.Add(CorrelationIdHeader, correlationId);
+        context.Response.Headers.Append(CorrelationIdHeader, correlationId);
 
         using (_logger.BeginScope(new Dictionary<string, object> { { CorrelationIdLogKey, correlationId } }))
         {

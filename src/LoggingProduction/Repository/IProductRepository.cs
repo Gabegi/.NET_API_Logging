@@ -1,4 +1,4 @@
-using LoggingShared.Models;
+using LoggingProduction.Models;
 
 namespace LoggingProduction.Repository;
 

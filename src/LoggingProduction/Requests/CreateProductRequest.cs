@@ -1,4 +1,4 @@
-namespace LoggingShared.Requests;
+namespace LoggingProduction.Requests;
 
 public record CreateProductRequest(
     string Name,

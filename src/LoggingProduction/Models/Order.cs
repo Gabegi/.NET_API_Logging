@@ -1,4 +1,4 @@
-namespace LoggingShared.Models;
+namespace LoggingProduction.Models;
 
 public record Product(
     string Id,
