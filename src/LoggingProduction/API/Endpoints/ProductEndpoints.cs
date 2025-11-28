@@ -1,6 +1,4 @@
-using LoggingProduction.Data.Repositories;
-using LoggingProduction.Data.Models.DTOs;
-using LoggingProduction.Data.Models.Entities;
+using LoggingProduction.API.Handlers;
 
 namespace LoggingProduction.API.Endpoints;
 
@@ -8,135 +6,29 @@ public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
     {
+        var handler = app.Services.GetRequiredService<ProductHandler>();
+
         var group = app.MapGroup("/api/products")
             .WithTags("Products");
 
-        group.MapGet("/", GetAllProducts)
+        group.MapGet("/", handler.GetAllProducts)
             .WithName("GetAllProducts")
             .WithOpenApi();
 
-        group.MapGet("/{id}", GetProductById)
+        group.MapGet("/{id}", handler.GetProductById)
             .WithName("GetProductById")
             .WithOpenApi();
 
-        group.MapPost("/", CreateProduct)
+        group.MapPost("/", handler.CreateProduct)
             .WithName("CreateProduct")
             .WithOpenApi();
 
-        group.MapPut("/{id}", UpdateProduct)
+        group.MapPut("/{id}", handler.UpdateProduct)
             .WithName("UpdateProduct")
             .WithOpenApi();
 
-        group.MapDelete("/{id}", DeleteProduct)
+        group.MapDelete("/{id}", handler.DeleteProduct)
             .WithName("DeleteProduct")
             .WithOpenApi();
-    }
-
-    private static async Task<IResult> GetAllProducts(
-        IProductRepository repository,
-        ILogger<Program> logger)
-    {
-        logger.LogInformation("Retrieving all products");
-
-        var products = await repository.GetAllAsync();
-
-        return Results.Ok(products);
-    }
-
-    private static async Task<IResult> GetProductById(
-        string id,
-        IProductRepository repository,
-        ILogger<Program> logger)
-    {
-        logger.LogInformation("Retrieving product {ProductId}", id);
-
-        var product = await repository.GetByIdAsync(id);
-
-        if (product is null)
-        {
-            logger.LogWarning("Product {ProductId} not found", id);
-            return Results.NotFound(new { message = "Product not found" });
-        }
-
-        return Results.Ok(product);
-    }
-
-    private static async Task<IResult> CreateProduct(
-        CreateProductRequest request,
-        IProductRepository repository,
-        ILogger<Program> logger)
-    {
-        var productId = Guid.NewGuid().ToString();
-
-        logger.LogInformation("Creating product with name {ProductName} and price {Price}",
-            request.Name, request.Price);
-
-        var product = new Product(
-            productId,
-            request.Name,
-            request.Description,
-            request.Price,
-            request.StockQuantity,
-            DateTime.UtcNow);
-
-        try
-        {
-            var created = await repository.CreateAsync(product);
-            logger.LogInformation("Product {ProductId} created successfully", created.Id);
-
-            return Results.Created($"/api/products/{created.Id}", created);
-        }
-        catch (TimeoutException ex)
-        {
-            logger.LogError(ex, "Failed to create product {ProductId} due to timeout", productId);
-            return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
-        }
-    }
-
-    private static async Task<IResult> UpdateProduct(
-        string id,
-        UpdateProductRequest request,
-        IProductRepository repository,
-        ILogger<Program> logger)
-    {
-        logger.LogInformation("Updating product {ProductId} with name {ProductName}", id, request.Name);
-
-        var product = new Product(
-            id,
-            request.Name,
-            request.Description,
-            request.Price,
-            request.StockQuantity,
-            DateTime.UtcNow);
-
-        var updated = await repository.UpdateAsync(id, product);
-
-        if (updated is null)
-        {
-            logger.LogWarning("Product {ProductId} not found for update", id);
-            return Results.NotFound(new { message = "Product not found" });
-        }
-
-        logger.LogInformation("Product {ProductId} updated successfully", id);
-        return Results.Ok(updated);
-    }
-
-    private static async Task<IResult> DeleteProduct(
-        string id,
-        IProductRepository repository,
-        ILogger<Program> logger)
-    {
-        logger.LogInformation("Deleting product {ProductId}", id);
-
-        var deleted = await repository.DeleteAsync(id);
-
-        if (!deleted)
-        {
-            logger.LogWarning("Product {ProductId} not found for deletion", id);
-            return Results.NotFound(new { message = "Product not found" });
-        }
-
-        logger.LogInformation("Product {ProductId} deleted successfully", id);
-        return Results.NoContent();
     }
 }
