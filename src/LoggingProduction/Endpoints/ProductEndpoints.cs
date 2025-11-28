@@ -1,6 +1,6 @@
 using LoggingProduction.Repository;
 using LoggingProduction.Models;
-using LoggingProduction.Requests;
+using LoggingProduction.Models.Entities;
 
 namespace LoggingProduction.Endpoints;
 

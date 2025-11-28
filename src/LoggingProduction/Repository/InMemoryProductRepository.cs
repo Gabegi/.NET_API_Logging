@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using LoggingProduction.Models;
+using LoggingProduction.Models.Entities;
 
 namespace LoggingProduction.Repository;
 

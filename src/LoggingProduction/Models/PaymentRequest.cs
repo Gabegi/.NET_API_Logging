@@ -1,4 +1,4 @@
-namespace LoggingProduction.Requests;
+namespace LoggingProduction.Models;
 
 public record PaymentRequest(
     string OrderId,
