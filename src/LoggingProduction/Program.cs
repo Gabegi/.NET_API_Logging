@@ -1,4 +1,5 @@
 using LoggingProduction.API.Endpoints;
+using LoggingProduction.API.Handlers;
 using LoggingProduction.API.Middleware;
 using LoggingProduction.Data.Repositories;
 using Serilog;
@@ -27,7 +28,14 @@ builder.Host.UseSerilog((context, configuration) =>
         .Enrich.WithThreadId());
 
 builder.Services.AddOpenApi();
+
+// Register repositories
 builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
+builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
+
+// Register handlers
+builder.Services.AddScoped<ProductHandler>();
+builder.Services.AddScoped<OrderHandler>();
 
 var app = builder.Build();
 
@@ -41,6 +49,7 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 
 // Map endpoints
 app.MapProductEndpoints();
+app.MapOrderEndpoints();
 app.MapHealthEndpoints();
 
 // Wrap app.Run() in try-catch to log startup/shutdown events
