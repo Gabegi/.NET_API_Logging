@@ -1,3 +1,5 @@
+using Serilog.Context;
+
 namespace LoggingProduction.API.Middleware;
 
 public class CorrelationIdMiddleware
@@ -5,28 +7,29 @@ public class CorrelationIdMiddleware
     private const string CorrelationIdHeader = "X-Correlation-Id";
     private const string CorrelationIdLogKey = "CorrelationId";
     private readonly RequestDelegate _next;
-    private readonly ILogger<CorrelationIdMiddleware> _logger;
 
-    public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
+    public CorrelationIdMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
+        // Get correlation ID from request header or generate new one
         var correlationId = context.Request.Headers.TryGetValue(CorrelationIdHeader, out var value)
             ? value.ToString()
             : Guid.NewGuid().ToString();
 
+        // Store in HttpContext.Items for later access
         context.Items[CorrelationIdLogKey] = correlationId;
+
+        // Add to response headers so client can reference it
         context.Response.Headers.Append(CorrelationIdHeader, correlationId);
 
-        using (_logger.BeginScope(new Dictionary<string, object> { { CorrelationIdLogKey, correlationId } }))
+        // Push to Serilog LogContext - this adds CorrelationId to ALL logs in this request
+        using (LogContext.PushProperty(CorrelationIdLogKey, correlationId))
         {
-            _logger.LogInformation("Request started with correlation ID: {CorrelationId}", correlationId);
             await _next(context);
-            _logger.LogInformation("Request completed with correlation ID: {CorrelationId}", correlationId);
         }
     }
 }
