@@ -23,8 +23,16 @@ public class CorrelationIdMiddleware
         // Store in HttpContext.Items for later access
         context.Items[CorrelationIdLogKey] = correlationId;
 
-        // Add to response headers so client can reference it
-        context.Response.Headers.Append(CorrelationIdHeader, correlationId);
+        // Add to response headers before response starts streaming
+        // OnStarting callback is guaranteed to be called before headers are sent to client
+        context.Response.OnStarting(() =>
+        {
+            if (!context.Response.Headers.ContainsKey(CorrelationIdHeader))
+            {
+                context.Response.Headers.Append(CorrelationIdHeader, correlationId);
+            }
+            return Task.CompletedTask;
+        });
 
         // Push to Serilog LogContext - this adds CorrelationId to ALL logs in this request
         using (LogContext.PushProperty(CorrelationIdLogKey, correlationId))
