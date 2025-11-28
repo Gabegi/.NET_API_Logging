@@ -4,42 +4,30 @@ using LoggingProduction.Data.Models.Entities;
 
 namespace LoggingProduction.Services;
 
-public class ProductHandler : IProductHandler
+public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
-    private readonly ILogger<ProductHandler> _logger;
+    private readonly ILogger<ProductService> _logger;
 
-    public ProductHandler(IProductRepository repository, ILogger<ProductHandler> logger)
+    public ProductService(IProductRepository repository, ILogger<ProductService> logger)
     {
         _repository = repository;
         _logger = logger;
     }
 
-    public async Task<IResult> GetAllProducts()
+    public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
         _logger.LogInformation("Retrieving all products");
-
-        var products = await _repository.GetAllAsync();
-
-        return Results.Ok(products);
+        return await _repository.GetAllAsync();
     }
 
-    public async Task<IResult> GetProductById(string id)
+    public async Task<Product?> GetProductByIdAsync(string id)
     {
         _logger.LogInformation("Retrieving product {ProductId}", id);
-
-        var product = await _repository.GetByIdAsync(id);
-
-        if (product is null)
-        {
-            _logger.LogWarning("Product {ProductId} not found", id);
-            return Results.NotFound(new { message = "Product not found" });
-        }
-
-        return Results.Ok(product);
+        return await _repository.GetByIdAsync(id);
     }
 
-    public async Task<IResult> CreateProduct(CreateProductRequest request)
+    public async Task<Product> CreateProductAsync(CreateProductRequest request)
     {
         var productId = Guid.NewGuid().ToString();
 
@@ -58,17 +46,16 @@ public class ProductHandler : IProductHandler
         {
             var created = await _repository.CreateAsync(product);
             _logger.LogInformation("Product {ProductId} created successfully", created.Id);
-
-            return Results.Created($"/api/products/{created.Id}", created);
+            return created;
         }
         catch (TimeoutException ex)
         {
             _logger.LogError(ex, "Failed to create product {ProductId} due to timeout", productId);
-            return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            throw;
         }
     }
 
-    public async Task<IResult> UpdateProduct(string id, UpdateProductRequest request)
+    public async Task<Product?> UpdateProductAsync(string id, UpdateProductRequest request)
     {
         _logger.LogInformation("Updating product {ProductId} with name {ProductName}", id, request.Name);
 
@@ -82,29 +69,32 @@ public class ProductHandler : IProductHandler
 
         var updated = await _repository.UpdateAsync(id, product);
 
-        if (updated is null)
+        if (updated is not null)
+        {
+            _logger.LogInformation("Product {ProductId} updated successfully", id);
+        }
+        else
         {
             _logger.LogWarning("Product {ProductId} not found for update", id);
-            return Results.NotFound(new { message = "Product not found" });
         }
 
-        _logger.LogInformation("Product {ProductId} updated successfully", id);
-        return Results.Ok(updated);
+        return updated;
     }
 
-    public async Task<IResult> DeleteProduct(string id)
+    public async Task<bool> DeleteProductAsync(string id)
     {
         _logger.LogInformation("Deleting product {ProductId}", id);
-
         var deleted = await _repository.DeleteAsync(id);
 
-        if (!deleted)
+        if (deleted)
+        {
+            _logger.LogInformation("Product {ProductId} deleted successfully", id);
+        }
+        else
         {
             _logger.LogWarning("Product {ProductId} not found for deletion", id);
-            return Results.NotFound(new { message = "Product not found" });
         }
 
-        _logger.LogInformation("Product {ProductId} deleted successfully", id);
-        return Results.NoContent();
+        return deleted;
     }
 }

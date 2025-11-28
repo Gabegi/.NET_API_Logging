@@ -4,42 +4,30 @@ using LoggingProduction.Data.Repositories;
 
 namespace LoggingProduction.Services;
 
-public class OrderHandler : IOrderHandler
+public class OrderService : IOrderService
 {
     private readonly IOrderRepository _repository;
-    private readonly ILogger<OrderHandler> _logger;
+    private readonly ILogger<OrderService> _logger;
 
-    public OrderHandler(IOrderRepository repository, ILogger<OrderHandler> logger)
+    public OrderService(IOrderRepository repository, ILogger<OrderService> logger)
     {
         _repository = repository;
         _logger = logger;
     }
 
-    public async Task<IResult> GetAllOrders()
+    public async Task<IEnumerable<Order>> GetAllOrdersAsync()
     {
         _logger.LogInformation("Retrieving all orders");
-
-        var orders = await _repository.GetAllAsync();
-
-        return Results.Ok(orders);
+        return await _repository.GetAllAsync();
     }
 
-    public async Task<IResult> GetOrderById(string id)
+    public async Task<Order?> GetOrderByIdAsync(string id)
     {
         _logger.LogInformation("Retrieving order {OrderId}", id);
-
-        var order = await _repository.GetByIdAsync(id);
-
-        if (order is null)
-        {
-            _logger.LogWarning("Order {OrderId} not found", id);
-            return Results.NotFound(new { message = "Order not found" });
-        }
-
-        return Results.Ok(order);
+        return await _repository.GetByIdAsync(id);
     }
 
-    public async Task<IResult> CreateOrder(CreateOrderRequest request)
+    public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
     {
         var orderId = Guid.NewGuid().ToString();
 
@@ -58,23 +46,20 @@ public class OrderHandler : IOrderHandler
             var created = await _repository.CreateAsync(order);
             _logger.LogInformation("Order {OrderId} created successfully with status {Status}",
                 created.Id, created.Status);
-
-            return Results.Created($"/api/orders/{created.Id}", created);
+            return created;
         }
         catch (TimeoutException ex)
         {
             _logger.LogError(ex, "Failed to create order {OrderId} due to timeout", orderId);
-            return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            throw;
         }
     }
 
-    public async Task<IResult> SearchOrders(string? customerId)
+    public async Task<IEnumerable<Order>> SearchOrdersAsync(string? customerId)
     {
         _logger.LogInformation("Searching orders with customerId filter: {CustomerId}",
             customerId ?? "all");
 
-        var orders = await _repository.SearchAsync(customerId);
-
-        return Results.Ok(orders);
+        return await _repository.SearchAsync(customerId);
     }
 }

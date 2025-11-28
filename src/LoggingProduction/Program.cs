@@ -33,9 +33,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
 builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
 
-// Register handlers
-builder.Services.AddScoped<IProductHandler, ProductHandler>();
-builder.Services.AddScoped<IOrderHandler, OrderHandler>();
+// Register services
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 
