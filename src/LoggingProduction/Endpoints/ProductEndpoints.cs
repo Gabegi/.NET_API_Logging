@@ -1,5 +1,5 @@
 using LoggingProduction.Repository;
-using LoggingProduction.Models;
+using LoggingProduction.Models.DTOs;
 using LoggingProduction.Models.Entities;
 
 namespace LoggingProduction.Endpoints;
