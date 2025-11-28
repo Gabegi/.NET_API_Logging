@@ -6,7 +6,7 @@ public static class OrderEndpoints
 {
     public static void MapOrderEndpoints(this WebApplication app)
     {
-        var handler = app.Services.GetRequiredService<OrderHandler>();
+        var handler = app.Services.GetRequiredService<IOrderHandler>();
 
         var group = app.MapGroup("/api/orders")
             .WithTags("Orders");

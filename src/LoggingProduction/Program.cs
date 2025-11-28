@@ -34,8 +34,8 @@ builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
 builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
 
 // Register handlers
-builder.Services.AddScoped<ProductHandler>();
-builder.Services.AddScoped<OrderHandler>();
+builder.Services.AddScoped<IProductHandler, ProductHandler>();
+builder.Services.AddScoped<IOrderHandler, OrderHandler>();
 
 var app = builder.Build();
 

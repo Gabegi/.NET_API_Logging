@@ -6,7 +6,7 @@ public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
     {
-        var handler = app.Services.GetRequiredService<ProductHandler>();
+        var handler = app.Services.GetRequiredService<IProductHandler>();
 
         var group = app.MapGroup("/api/products")
             .WithTags("Products");

@@ -4,7 +4,7 @@ using LoggingProduction.Data.Models.Entities;
 
 namespace LoggingProduction.API.Handlers;
 
-public class ProductHandler
+public class ProductHandler : IProductHandler
 {
     private readonly IProductRepository _repository;
     private readonly ILogger<ProductHandler> _logger;

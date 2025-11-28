@@ -4,7 +4,7 @@ using LoggingProduction.Data.Repositories;
 
 namespace LoggingProduction.API.Handlers;
 
-public class OrderHandler
+public class OrderHandler : IOrderHandler
 {
     private readonly IOrderRepository _repository;
     private readonly ILogger<OrderHandler> _logger;
