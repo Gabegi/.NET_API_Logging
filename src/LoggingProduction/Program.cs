@@ -1,7 +1,7 @@
 using LoggingProduction.API.Endpoints;
-using LoggingProduction.API.Handlers;
 using LoggingProduction.API.Middleware;
 using LoggingProduction.Data.Repositories;
+using LoggingProduction.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

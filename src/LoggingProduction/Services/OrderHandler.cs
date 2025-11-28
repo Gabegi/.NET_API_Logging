@@ -2,7 +2,7 @@ using LoggingProduction.Data.Models.DTOs;
 using LoggingProduction.Data.Models.Entities;
 using LoggingProduction.Data.Repositories;
 
-namespace LoggingProduction.API.Handlers;
+namespace LoggingProduction.Services;
 
 public class OrderHandler : IOrderHandler
 {

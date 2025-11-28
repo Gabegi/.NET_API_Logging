@@ -2,7 +2,7 @@ using LoggingProduction.Data.Repositories;
 using LoggingProduction.Data.Models.DTOs;
 using LoggingProduction.Data.Models.Entities;
 
-namespace LoggingProduction.API.Handlers;
+namespace LoggingProduction.Services;
 
 public class ProductHandler : IProductHandler
 {

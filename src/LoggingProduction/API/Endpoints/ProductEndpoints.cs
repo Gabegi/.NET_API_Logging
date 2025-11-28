@@ -1,4 +1,4 @@
-using LoggingProduction.API.Handlers;
+using LoggingProduction.Services;
 
 namespace LoggingProduction.API.Endpoints;
 
@@ -6,28 +6,28 @@ public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
     {
-        var handler = app.Services.GetRequiredService<IProductHandler>();
+        var service = app.Services.GetRequiredService<IProductHandler>();
 
         var group = app.MapGroup("/api/products")
             .WithTags("Products");
 
-        group.MapGet("/", handler.GetAllProducts)
+        group.MapGet("/", service.GetAllProducts)
             .WithName("GetAllProducts")
             .WithOpenApi();
 
-        group.MapGet("/{id}", handler.GetProductById)
+        group.MapGet("/{id}", service.GetProductById)
             .WithName("GetProductById")
             .WithOpenApi();
 
-        group.MapPost("/", handler.CreateProduct)
+        group.MapPost("/", service.CreateProduct)
             .WithName("CreateProduct")
             .WithOpenApi();
 
-        group.MapPut("/{id}", handler.UpdateProduct)
+        group.MapPut("/{id}", service.UpdateProduct)
             .WithName("UpdateProduct")
             .WithOpenApi();
 
-        group.MapDelete("/{id}", handler.DeleteProduct)
+        group.MapDelete("/{id}", service.DeleteProduct)
             .WithName("DeleteProduct")
             .WithOpenApi();
     }

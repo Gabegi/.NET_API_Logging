@@ -1,6 +1,6 @@
 using LoggingProduction.Data.Models.DTOs;
 
-namespace LoggingProduction.API.Handlers;
+namespace LoggingProduction.Services;
 
 public interface IProductHandler
 {
