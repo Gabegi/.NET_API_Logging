@@ -1,4 +1,4 @@
-namespace LoggingProduction.Models.Entities;
+namespace LoggingProduction.Data.Models.Entities;
 
 public enum OrderStatus
 {

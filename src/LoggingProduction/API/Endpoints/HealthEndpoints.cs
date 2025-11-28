@@ -1,4 +1,4 @@
-namespace LoggingProduction.Endpoints;
+namespace LoggingProduction.API.Endpoints;
 
 public static class HealthEndpoints
 {

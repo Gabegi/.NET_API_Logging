@@ -1,4 +1,4 @@
-namespace LoggingProduction.Middleware;
+namespace LoggingProduction.API.Middleware;
 
 public class CorrelationIdMiddleware
 {

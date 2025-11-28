@@ -1,4 +1,4 @@
-namespace LoggingProduction.Models.Entities;
+namespace LoggingProduction.Data.Models.Entities;
 
 public record Product(
     string Id,

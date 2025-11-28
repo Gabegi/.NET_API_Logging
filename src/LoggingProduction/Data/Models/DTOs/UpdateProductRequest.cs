@@ -1,6 +1,6 @@
-namespace LoggingProduction.Models.DTOs;
+namespace LoggingProduction.Data.Models.DTOs;
 
-public record CreateProductRequest(
+public record UpdateProductRequest(
     string Name,
     string Description,
     decimal Price,

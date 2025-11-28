@@ -1,6 +1,6 @@
-using LoggingProduction.Models.Entities;
+using LoggingProduction.Data.Models.Entities;
 
-namespace LoggingProduction.Repository;
+namespace LoggingProduction.Data.Repositories;
 
 public interface IProductRepository
 {

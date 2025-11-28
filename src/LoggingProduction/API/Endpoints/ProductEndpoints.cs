@@ -1,8 +1,8 @@
-using LoggingProduction.Repository;
-using LoggingProduction.Models.DTOs;
-using LoggingProduction.Models.Entities;
+using LoggingProduction.Data.Repositories;
+using LoggingProduction.Data.Models.DTOs;
+using LoggingProduction.Data.Models.Entities;
 
-namespace LoggingProduction.Endpoints;
+namespace LoggingProduction.API.Endpoints;
 
 public static class ProductEndpoints
 {

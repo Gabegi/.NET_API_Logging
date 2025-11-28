@@ -1,4 +1,4 @@
-namespace LoggingProduction.Models.DTOs;
+namespace LoggingProduction.Data.Models.DTOs;
 
 public record CreateOrderRequest(
     string CustomerId,
