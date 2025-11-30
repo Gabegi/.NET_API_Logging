@@ -29,7 +29,6 @@ builder.Host.UseSerilog((context, configuration) =>
 
         // Write logs to Elasticsearch for centralized log aggregation
         // Requires Elasticsearch running on localhost:9200
-        // Optional: Set environment variable ELASTICSEARCH_ENABLED=true to enable/disable
         .WriteTo.Async(a => a.Elasticsearch(
             new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
             {
@@ -51,14 +50,9 @@ builder.Host.UseSerilog((context, configuration) =>
                 // Override default minimum log level for Elasticsearch
                 MinimumLogEventLevel = Serilog.Events.LogEventLevel.Information,
 
-                // Custom format - use ElasticsearchJsonFormatter for proper JSON
-                CustomFormatter = null,
-
                 // Enable this to see detailed ES errors in logs
-                FailureCallback = e => Console.WriteLine($"Unable to submit event to Elasticsearch: {e.MessageTemplate}"),
-
-                // Connection settings
-                ConnectionGuid = Guid.NewGuid()
+                FailureCallback = (logEvent, exception) =>
+                    Console.WriteLine($"Unable to submit event to Elasticsearch: {logEvent.MessageTemplate}")
             }))
 
         // Enrich logs with additional context
