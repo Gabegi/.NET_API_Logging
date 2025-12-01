@@ -33,35 +33,34 @@ public static class SerilogConfiguration
 
                 // Write logs to Elasticsearch for centralized log aggregation
                 // Requires Elasticsearch running on localhost:9200
-                // TODO: Re-enable after fixing initialization timeout issue
-                // .WriteTo.Async(a => a.Elasticsearch(
-                //     new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
-                //     {
-                //         // Index name pattern: logstash-YYYY.MM.DD (daily indices)
-                //         IndexFormat = "logstash-{0:yyyy.MM.dd}",
-                //
-                //         // Number of events to batch before sending to Elasticsearch
-                //         BatchPostingLimit = 100,
-                //
-                //         // Time to wait before sending partial batch
-                //         Period = TimeSpan.FromSeconds(5),
-                //
-                //         // Auto-register Elasticsearch index mapping (disabled to prevent blocking)
-                //         AutoRegisterTemplate = false,
-                //
-                //         // Template name (must match index pattern)
-                //         TemplateName = "logstash-template",
-                //
-                //         // Override default minimum log level for Elasticsearch
-                //         MinimumLogEventLevel = LogEventLevel.Information,
-                //
-                //         // Connection timeout to prevent blocking
-                //         ConnectionTimeout = TimeSpan.FromSeconds(5),
-                //
-                //         // Enable this to see detailed ES errors in logs
-                //         FailureCallback = (logEvent, exception) =>
-                //             Console.WriteLine($"Unable to submit event to Elasticsearch: {logEvent.MessageTemplate}")
-                //     }))
+                .WriteTo.Async(a => a.Elasticsearch(
+                    new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                    {
+                        // Index name pattern: logstash-YYYY.MM.DD (daily indices)
+                        IndexFormat = "logstash-{0:yyyy.MM.dd}",
+
+                        // Number of events to batch before sending to Elasticsearch
+                        BatchPostingLimit = 100,
+
+                        // Time to wait before sending partial batch
+                        Period = TimeSpan.FromSeconds(5),
+
+                        // Auto-register Elasticsearch index mapping (disabled to prevent blocking)
+                        AutoRegisterTemplate = false,
+
+                        // Template name (must match index pattern)
+                        TemplateName = "logstash-template",
+
+                        // Override default minimum log level for Elasticsearch
+                        MinimumLogEventLevel = LogEventLevel.Information,
+
+                        // Connection timeout to prevent blocking
+                        ConnectionTimeout = TimeSpan.FromSeconds(5),
+
+                        // Enable this to see detailed ES errors in logs
+                        FailureCallback = (logEvent, exception) =>
+                            Console.WriteLine($"Unable to submit event to Elasticsearch: {logEvent.MessageTemplate}")
+                    }))
 
                 // Enrich logs with additional context
                 .Enrich.FromLogContext()
