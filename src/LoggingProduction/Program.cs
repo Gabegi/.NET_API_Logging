@@ -36,23 +36,29 @@ app.MapProductEndpoints();
 app.MapOrderEndpoints();
 app.MapHealthEndpoints();
 
-// Wrap app.Run() in try-catch to log startup/shutdown events
+// Wrap app.RunAsync() in try-catch to log startup/shutdown events
 // This ensures we capture critical application lifecycle logs
 try
 {
+    Log.Information("Application starting {@Application}", new {
+        Application = "LoggingProduction",
+        Environment = app.Environment.EnvironmentName,
+        MachineName = Environment.MachineName
+    });
+
     // Start the web application
-    // Note: Startup logs are captured via Serilog enrichment during first request
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {
     // Log fatal errors that crash the application
     // Critical for diagnosing startup failures
     Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
 finally
 {
     // Flush any buffered logs before app exits
     // Without this, last few logs might be lost
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
