@@ -40,10 +40,8 @@ app.MapHealthEndpoints();
 // This ensures we capture critical application lifecycle logs
 try
 {
-    // Log successful startup (helps confirm app is running)
-    Log.Information("Starting application");
-
     // Start the web application
+    // Note: Startup logs are captured via Serilog enrichment during first request
     app.Run();
 }
 catch (Exception ex)
