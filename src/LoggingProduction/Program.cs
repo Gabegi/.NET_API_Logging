@@ -10,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog as the logging provider
 builder.ConfigureSerilog();
 
+// Configure OpenTelemetry with Elastic APM
+builder.Services.AddOpenTelemetryWithElasticAPM();
+
 builder.Services.AddOpenApi();
 
 // Register repositories

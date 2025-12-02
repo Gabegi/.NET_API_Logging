@@ -36,6 +36,27 @@ services:
     networks:
       - elastic
 
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.11.0
+    container_name: apm-server
+    ports:
+      - "8200:8200"
+    environment:
+      - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+      - apm-server.rum.enabled=true
+      - apm-server.auth.anonymous.enabled=true
+      - apm-server.pipeline.enabled=false
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: curl -s http://localhost:8200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - elastic
+
 volumes:
   es_data:
     driver: local
