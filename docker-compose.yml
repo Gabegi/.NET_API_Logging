@@ -41,11 +41,15 @@ services:
     container_name: apm-server
     ports:
       - "8200:8200"
+      - "4317:4317"
     environment:
       - output.elasticsearch.hosts=["http://elasticsearch:9200"]
       - apm-server.rum.enabled=true
       - apm-server.auth.anonymous.enabled=true
       - apm-server.pipeline.enabled=false
+      - apm-server.otlp.enabled=true
+      - apm-server.otlp.grpc.enabled=true
+      - apm-server.otlp.http.enabled=true
     depends_on:
       elasticsearch:
         condition: service_healthy

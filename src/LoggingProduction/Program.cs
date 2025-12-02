@@ -10,8 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog as the logging provider
 builder.ConfigureSerilog();
 
-// Configure OpenTelemetry with Elastic APM
-builder.Services.AddOpenTelemetryWithElasticAPM();
+// Configure OpenTelemetry (Dev: Console export, Prod: Elastic APM)
+builder.Services.AddOpenTelemetryWithEnvironmentExport(builder.Environment);
 
 builder.Services.AddOpenApi();
 
