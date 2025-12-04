@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using LoggingProduction.Data.Models.Entities;
+using LoggingProduction.Telemetry;
 
 namespace LoggingProduction.Data.Repositories;
 
@@ -15,18 +16,18 @@ public class InMemoryProductRepository : IProductRepository
 
     public async Task<Product?> GetByIdAsync(string id)
     {
-        _logger.LogInformation("Fetching product {ProductId} from repository", id);
+        ProductRepositoryLogger.LogFetchingProduct(_logger, id);
         await Task.Delay(Random.Shared.Next(10, 50));
 
         var product = _products.GetValueOrDefault(id);
 
         if (product == null)
         {
-            _logger.LogWarning("Product {ProductId} not found in repository", id);
+            ProductRepositoryLogger.LogProductNotFound(_logger, id);
         }
         else
         {
-            _logger.LogInformation("Product {ProductId} retrieved successfully", id);
+            ProductRepositoryLogger.LogProductFound(_logger, id);
         }
 
         return product;
@@ -34,45 +35,44 @@ public class InMemoryProductRepository : IProductRepository
 
     public async Task<Product> CreateAsync(Product product)
     {
-        _logger.LogInformation("Saving product {ProductId} to repository with name {ProductName} and price {Price}",
-            product.Id, product.Name, product.Price);
+        ProductRepositoryLogger.LogSavingProduct(_logger, product.Id, product.Name, product.Price);
 
         await Task.Delay(Random.Shared.Next(50, 200));
 
         if (Random.Shared.Next(100) < 5)
         {
-            _logger.LogError("Database connection timeout while saving product {ProductId}", product.Id);
+            ProductRepositoryLogger.LogDatabaseTimeout(_logger, new TimeoutException("Database connection timeout"), product.Id);
             throw new TimeoutException("Database connection timeout");
         }
 
         _products[product.Id] = product;
-        _logger.LogInformation("Product {ProductId} saved successfully", product.Id);
+        ProductRepositoryLogger.LogProductSavedSuccessfully(_logger, product.Id);
 
         return product;
     }
 
     public async Task<Product?> UpdateAsync(string id, Product product)
     {
-        _logger.LogInformation("Updating product {ProductId} with name {ProductName}", id, product.Name);
+        ProductRepositoryLogger.LogUpdatingProduct(_logger, id);
 
         await Task.Delay(Random.Shared.Next(50, 150));
 
         if (!_products.ContainsKey(id))
         {
-            _logger.LogWarning("Product {ProductId} not found for update", id);
+            ProductRepositoryLogger.LogProductNotFound(_logger, id);
             return null;
         }
 
         var updated = product with { Id = id };
         _products[id] = updated;
-        _logger.LogInformation("Product {ProductId} updated successfully", id);
+        ProductRepositoryLogger.LogProductUpdated(_logger, id);
 
         return updated;
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
-        _logger.LogInformation("Deleting product {ProductId}", id);
+        ProductRepositoryLogger.LogDeletingProduct(_logger, id);
 
         await Task.Delay(Random.Shared.Next(20, 100));
 
@@ -80,11 +80,11 @@ public class InMemoryProductRepository : IProductRepository
 
         if (deleted)
         {
-            _logger.LogInformation("Product {ProductId} deleted successfully", id);
+            ProductRepositoryLogger.LogProductDeleted(_logger, id);
         }
         else
         {
-            _logger.LogWarning("Product {ProductId} not found for deletion", id);
+            ProductRepositoryLogger.LogProductNotFound(_logger, id);
         }
 
         return deleted;
@@ -92,12 +92,12 @@ public class InMemoryProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        _logger.LogInformation("Fetching all products from repository");
+        ProductRepositoryLogger.LogFetchingAllProducts(_logger);
 
         await Task.Delay(Random.Shared.Next(20, 100));
 
         var products = _products.Values.ToList();
-        _logger.LogInformation("Retrieved {Count} products from repository", products.Count);
+        ProductRepositoryLogger.LogRetrievedProducts(_logger, products.Count);
 
         return products;
     }

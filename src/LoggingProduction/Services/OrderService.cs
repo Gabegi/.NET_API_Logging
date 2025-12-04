@@ -21,7 +21,7 @@ public class OrderService : IOrderService
         using var activity = ActivitySourceProvider.Source.StartActivity("GetAllOrders");
         activity?.SetTag("operation.type", "read");
 
-        _logger.LogInformation("Retrieving all orders");
+        OrderServiceLogger.LogRetrievingAllOrders(_logger);
         return await _repository.GetAllAsync();
     }
 
@@ -30,7 +30,7 @@ public class OrderService : IOrderService
         using var activity = ActivitySourceProvider.Source.StartActivity("GetOrderById");
         activity?.SetTag("order.id", id);
 
-        _logger.LogInformation("Retrieving order {OrderId}", id);
+        OrderServiceLogger.LogRetrievingOrder(_logger, id);
         return await _repository.GetByIdAsync(id);
     }
 
@@ -42,8 +42,7 @@ public class OrderService : IOrderService
 
         var orderId = Guid.NewGuid().ToString();
 
-        _logger.LogInformation("Creating order for customer {CustomerId} with total {Total}",
-            request.CustomerId, request.Total);
+        OrderServiceLogger.LogCreatingOrder(_logger, request.CustomerId, request.Total);
 
         var order = new Order(
             orderId,
@@ -60,8 +59,7 @@ public class OrderService : IOrderService
                 repoActivity?.SetTag("order.id", orderId);
                 var created = await _repository.CreateAsync(order);
                 repoActivity?.SetTag("repository.success", true);
-                _logger.LogInformation("Order {OrderId} created successfully with status {Status}",
-                    created.Id, created.Status);
+                OrderServiceLogger.LogOrderCreatedSuccessfully(_logger, created.Id, created.Status.ToString());
                 return created;
             }
         }
@@ -69,15 +67,14 @@ public class OrderService : IOrderService
         {
             activity?.SetTag("error", true);
             activity?.SetTag("error.message", ex.Message);
-            _logger.LogError(ex, "Failed to create order {OrderId} due to timeout", orderId);
+            OrderServiceLogger.LogOrderCreationTimeout(_logger, ex, orderId);
             throw;
         }
     }
 
     public async Task<IEnumerable<Order>> SearchOrdersAsync(string? customerId)
     {
-        _logger.LogInformation("Searching orders with customerId filter: {CustomerId}",
-            customerId ?? "all");
+        OrderServiceLogger.LogSearchingOrders(_logger, customerId ?? "all");
 
         return await _repository.SearchAsync(customerId);
     }

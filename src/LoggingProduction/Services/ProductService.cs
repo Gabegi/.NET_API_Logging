@@ -30,7 +30,7 @@ public class ProductService : IProductService
         using var activity = ActivitySourceProvider.Source.StartActivity("GetProductById");
         activity?.SetTag("product.id", id);
 
-        _logger.LogInformation("Retrieving product {ProductId}", id);
+        ProductServiceLogger.LogRetrievingProduct(_logger, id);
         return await _repository.GetByIdAsync(id);
     }
 
@@ -42,8 +42,7 @@ public class ProductService : IProductService
 
         var productId = Guid.NewGuid().ToString();
 
-        _logger.LogInformation("Creating product with name {ProductName} and price {Price}",
-            request.Name, request.Price);
+        ProductServiceLogger.LogCreatingProduct(_logger, request.Name, request.Price);
 
         var product = new Product(
             productId,
@@ -61,7 +60,7 @@ public class ProductService : IProductService
                 repoActivity?.SetTag("product.id", productId);
                 var created = await _repository.CreateAsync(product);
                 repoActivity?.SetTag("repository.success", true);
-                _logger.LogInformation("Product {ProductId} created successfully", created.Id);
+                ProductServiceLogger.LogProductCreatedSuccessfully(_logger, created.Id);
                 return created;
             }
         }
@@ -69,14 +68,14 @@ public class ProductService : IProductService
         {
             activity?.SetTag("error", true);
             activity?.SetTag("error.message", ex.Message);
-            _logger.LogError(ex, "Failed to create product {ProductId} due to timeout", productId);
+            ProductServiceLogger.LogProductCreationTimeout(_logger, ex, productId);
             throw;
         }
     }
 
     public async Task<Product?> UpdateProductAsync(string id, UpdateProductRequest request)
     {
-        _logger.LogInformation("Updating product {ProductId} with name {ProductName}", id, request.Name);
+        ProductServiceLogger.LogUpdatingProduct(_logger, id, request.Name);
 
         var product = new Product(
             id,
@@ -90,11 +89,11 @@ public class ProductService : IProductService
 
         if (updated is not null)
         {
-            _logger.LogInformation("Product {ProductId} updated successfully", id);
+            ProductServiceLogger.LogProductUpdatedSuccessfully(_logger, id);
         }
         else
         {
-            _logger.LogWarning("Product {ProductId} not found for update", id);
+            ProductServiceLogger.LogProductNotFoundForUpdate(_logger, id);
         }
 
         return updated;
@@ -102,16 +101,16 @@ public class ProductService : IProductService
 
     public async Task<bool> DeleteProductAsync(string id)
     {
-        _logger.LogInformation("Deleting product {ProductId}", id);
+        ProductServiceLogger.LogDeletingProduct(_logger, id);
         var deleted = await _repository.DeleteAsync(id);
 
         if (deleted)
         {
-            _logger.LogInformation("Product {ProductId} deleted successfully", id);
+            ProductServiceLogger.LogProductDeletedSuccessfully(_logger, id);
         }
         else
         {
-            _logger.LogWarning("Product {ProductId} not found for deletion", id);
+            ProductServiceLogger.LogProductNotFoundForDeletion(_logger, id);
         }
 
         return deleted;
