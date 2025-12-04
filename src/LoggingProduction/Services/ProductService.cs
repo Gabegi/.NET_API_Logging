@@ -1,6 +1,7 @@
 using LoggingProduction.Data.Repositories;
 using LoggingProduction.Data.Models.DTOs;
 using LoggingProduction.Data.Models.Entities;
+using LoggingProduction.Telemetry;
 
 namespace LoggingProduction.Services;
 
@@ -17,18 +18,28 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
+        using var activity = ActivitySourceProvider.Source.StartActivity("GetAllProducts");
+        activity?.SetTag("operation.type", "read");
+
         _logger.LogInformation("Retrieving all products");
         return await _repository.GetAllAsync();
     }
 
     public async Task<Product?> GetProductByIdAsync(string id)
     {
+        using var activity = ActivitySourceProvider.Source.StartActivity("GetProductById");
+        activity?.SetTag("product.id", id);
+
         _logger.LogInformation("Retrieving product {ProductId}", id);
         return await _repository.GetByIdAsync(id);
     }
 
     public async Task<Product> CreateProductAsync(CreateProductRequest request)
     {
+        using var activity = ActivitySourceProvider.Source.StartActivity("CreateProduct");
+        activity?.SetTag("product.name", request.Name);
+        activity?.SetTag("product.price", request.Price);
+
         var productId = Guid.NewGuid().ToString();
 
         _logger.LogInformation("Creating product with name {ProductName} and price {Price}",
@@ -44,12 +55,20 @@ public class ProductService : IProductService
 
         try
         {
-            var created = await _repository.CreateAsync(product);
-            _logger.LogInformation("Product {ProductId} created successfully", created.Id);
-            return created;
+            // Create child span for repository operation
+            using (var repoActivity = ActivitySourceProvider.Source.StartActivity("SaveProductToRepository"))
+            {
+                repoActivity?.SetTag("product.id", productId);
+                var created = await _repository.CreateAsync(product);
+                repoActivity?.SetTag("repository.success", true);
+                _logger.LogInformation("Product {ProductId} created successfully", created.Id);
+                return created;
+            }
         }
         catch (TimeoutException ex)
         {
+            activity?.SetTag("error", true);
+            activity?.SetTag("error.message", ex.Message);
             _logger.LogError(ex, "Failed to create product {ProductId} due to timeout", productId);
             throw;
         }
