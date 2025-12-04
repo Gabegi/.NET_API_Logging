@@ -21,7 +21,7 @@ public class ProductService : IProductService
         using var activity = ActivitySourceProvider.Source.StartActivity("GetAllProducts");
         activity?.SetTag("operation.type", "read");
 
-        _logger.LogInformation("Retrieving all products");
+        ProductServiceLogger.LogRetrievingAllProducts(_logger);
         return await _repository.GetAllAsync();
     }
 
