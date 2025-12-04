@@ -1,6 +1,8 @@
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
+using Serilog.Enrichers.Sensitive;
+using Serilog.Enrichers.Sensitive.Models;
 
 namespace LoggingProduction.LoggingExtensions;
 
@@ -68,6 +70,33 @@ public static class SerilogConfiguration
                 .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
                 .Enrich.WithEnvironmentUserName()
                 .Enrich.WithMachineName()
-                .Enrich.WithThreadId());
+                .Enrich.WithThreadId()
+
+                // Mask sensitive data (PII) to prevent GDPR/PCI-DSS violations
+                .Enrich.WithSensitiveDataMasking(options =>
+                {
+                    // Mask email addresses: john@example.com -> j***@example.com
+                    options.MaskProperties.Add(new MaskProperty { Name = "Email" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "email" });
+
+                    // Mask credit card numbers: 4532-1234-5678-9010 -> ****-****-****-9010
+                    options.MaskProperties.Add(new MaskProperty { Name = "CardNumber" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "CreditCard" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "Card" });
+
+                    // Mask passwords and API keys
+                    options.MaskProperties.Add(new MaskProperty { Name = "Password" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "ApiKey" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "Secret" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "Token" });
+
+                    // Mask phone numbers
+                    options.MaskProperties.Add(new MaskProperty { Name = "PhoneNumber" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "Phone" });
+
+                    // Mask social security numbers
+                    options.MaskProperties.Add(new MaskProperty { Name = "SSN" });
+                    options.MaskProperties.Add(new MaskProperty { Name = "SocialSecurityNumber" });
+                }));
     }
 }
