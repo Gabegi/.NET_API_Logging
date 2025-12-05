@@ -1,3 +1,4 @@
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -9,15 +10,21 @@ namespace LoggingProduction.LoggingExtensions;
 public static class OpenTelemetryExtensions
 {
     /// <summary>
-    /// Adds OpenTelemetry tracing with environment-based export
+    /// Adds OpenTelemetry tracing and metrics with environment-based export
     /// Development: Console exporter (for debugging)
     /// Production: Elastic APM Server via OTLP
     /// </summary>
     public static IServiceCollection AddOpenTelemetryWithEnvironmentExport(this IServiceCollection services, IHostEnvironment env)
     {
-        var tracingBuilder = services.AddOpenTelemetry()
+        var builder = services.AddOpenTelemetry()
             .ConfigureResource(resource => resource
                 .AddService(serviceName: "LoggingProduction"))
+
+            // Configure Metrics
+            .WithMetrics(metrics => metrics
+                .AddAspNetCoreInstrumentation()      // HTTP request metrics
+                .AddRuntimeInstrumentation()         // Memory, GC, threads
+                .AddHttpClientInstrumentation())     // Outgoing HTTP calls
 
             // Configure Traces
             .WithTracing(tracing => tracing
@@ -34,14 +41,20 @@ public static class OpenTelemetryExtensions
         // Environment-specific export configuration
         if (env.IsDevelopment())
         {
-            // Development: Export traces to console for easy debugging
-            tracingBuilder.WithTracing(tracing => tracing
-                .AddConsoleExporter());
+            // Development: Export traces and metrics to console for easy debugging
+            builder.WithTracing(tracing => tracing.AddConsoleExporter());
+            builder.WithMetrics(metrics => metrics.AddConsoleExporter());
         }
         else
         {
-            // Production: Export traces to Elastic APM Server via OTLP gRPC
-            tracingBuilder.WithTracing(tracing => tracing
+            // Production: Export traces and metrics to Elastic APM Server via OTLP gRPC
+            builder.WithTracing(tracing => tracing
+                .AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri("http://localhost:4317");
+                }));
+
+            builder.WithMetrics(metrics => metrics
                 .AddOtlpExporter(options =>
                 {
                     options.Endpoint = new Uri("http://localhost:4317");
