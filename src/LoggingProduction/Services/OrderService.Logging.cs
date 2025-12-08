@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace LoggingProduction.Telemetry;
+namespace LoggingProduction.Services;
 
 /// <summary>
 /// Source-generated logger for OrderService
