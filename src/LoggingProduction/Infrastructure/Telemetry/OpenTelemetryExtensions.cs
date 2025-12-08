@@ -3,7 +3,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace LoggingProduction.LoggingExtensions;
+namespace LoggingProduction.Infrastructure.Telemetry;
 
 /// <summary>
 /// Extension methods for configuring OpenTelemetry

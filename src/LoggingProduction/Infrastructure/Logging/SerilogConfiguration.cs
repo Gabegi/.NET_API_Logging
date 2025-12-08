@@ -3,7 +3,7 @@ using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Enrichers.Sensitive;
 
-namespace LoggingProduction.LoggingExtensions;
+namespace LoggingProduction.Infrastructure.Logging;
 
 /// <summary>
 /// Extension methods for configuring Serilog logging

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace LoggingProduction.Telemetry;
+namespace LoggingProduction.Data.Repositories;
 
 /// <summary>
 /// Source-generated logger for ProductRepository

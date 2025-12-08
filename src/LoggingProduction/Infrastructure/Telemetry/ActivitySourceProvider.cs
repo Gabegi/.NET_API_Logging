@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace LoggingProduction.Telemetry;
+namespace LoggingProduction.Infrastructure.Telemetry;
 
 /// <summary>
 /// Centralized ActivitySource for distributed tracing

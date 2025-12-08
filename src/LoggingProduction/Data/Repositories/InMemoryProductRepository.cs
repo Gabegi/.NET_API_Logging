@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using LoggingProduction.Data.Models.Entities;
-using LoggingProduction.Telemetry;
 
 namespace LoggingProduction.Data.Repositories;
 

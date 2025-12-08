@@ -1,7 +1,7 @@
 using LoggingProduction.Data.Models.DTOs;
 using LoggingProduction.Data.Models.Entities;
 using LoggingProduction.Data.Repositories;
-using LoggingProduction.Telemetry;
+using LoggingProduction.Infrastructure.Telemetry;
 
 namespace LoggingProduction.Services;
 

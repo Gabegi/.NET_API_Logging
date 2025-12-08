@@ -1,7 +1,7 @@
 using Serilog;
 using Serilog.Events;
 
-namespace LoggingProduction.LoggingExtensions;
+namespace LoggingProduction.Infrastructure.Logging;
 
 /// <summary>
 /// Extension methods for configuring Serilog request/response logging
